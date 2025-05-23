@@ -153,8 +153,17 @@ Beberapa teknik data preparation yang diterapkan dalam proyek ini:
    * Missing value pada kolom TreeCoverLoss\_ha dan GrossEmissions\_Co2\_all\_gases\_Mg diisi dengan nilai median dari kolom tersebut.
 
    ```python
-   df['TreeCoverLoss_ha'] = df['TreeCoverLoss_ha'].fillna(df['TreeCoverLoss_ha'].median())
-   df['GrossEmissions_Co2_all_gases_Mg'] = df['GrossEmissions_Co2_all_gases_Mg'].fillna(df['GrossEmissions_Co2_all_gases_Mg'].median())
+   # Memeriksa missing values sebelum penanganan
+    print("Missing Values sebelum Penanganan:")
+    print(df.isnull().sum())
+
+   # Mengisi missing value dengan median pada kolom tertentu
+    df['TreeCoverLoss_ha'] = df['TreeCoverLoss_ha'].fillna(df['TreeCoverLoss_ha'].median())
+    df['GrossEmissions_Co2_all_gases_Mg'] = df['GrossEmissions_Co2_all_gases_Mg'].fillna(df['GrossEmissions_Co2_all_gases_Mg'].median())
+
+   # Memeriksa missing values setelah penanganan
+    print("\nMissing Values setelah Penanganan:")
+    print(df.isnull().sum())
 
    ```
 
@@ -165,7 +174,11 @@ Beberapa teknik data preparation yang diterapkan dalam proyek ini:
    * Membuat fitur baru `avg_tree_cover_loss_per_year` yang menghitung rata-rata kehilangan tutupan pohon per tahun.
 
    ```python
-   df['avg_tree_cover_loss_per_year'] = df['TreeCoverLoss_ha'] / (2020 - df['Year'])
+   # Membuat fitur baru: rata-rata kehilangan tutupan pohon per tahun
+    df['avg_tree_cover_loss_per_year'] = df['TreeCoverLoss_ha'] / (2020 - df['Year'])
+
+   # Cek beberapa baris data
+    df[['TreeCoverLoss_ha', 'Year', 'avg_tree_cover_loss_per_year']].head()
    ```
 
    Fitur ini dapat memberikan informasi tentang laju kehilangan tutupan pohon yang dinormalisasi terhadap waktu.
@@ -175,52 +188,98 @@ Beberapa teknik data preparation yang diterapkan dalam proyek ini:
    * Mengubah fitur kategorikal CountryCode menjadi bentuk numerik menggunakan Label Encoding.
 
    ```python
-   label_encoder = LabelEncoder()
-   df['CountryCode_encoded'] = label_encoder.fit_transform(df['CountryCode'])
+   # Inisialisasi LabelEncoder
+    label_encoder = LabelEncoder()
+
+   # Membuat salinan untuk menghindari chained assignment warning
+    df['CountryCode_encoded'] = label_encoder.fit_transform(df['CountryCode'])
+
+   # Menampilkan beberapa hasil
+    df[['CountryCode', 'CountryCode_encoded']].head()
    ```
 
    Encoding ini diperlukan agar variabel kategorikal dapat diproses oleh model machine learning.
 
 4. **Feature Scaling**
 
-   * Standarisasi fitur dengan StandardScaler:.
+   * Proses Menginisialisasi StandardScaler untuk menormalkan fitur sehingga memiliki rata-rata 0 dan standar deviasi 1
+     Melakukan fit scaler hanya pada data latih (X_train) agar informasi skala berasal dari data pelatihan saja
+     Mentransformasikan data latih dan data uji (X_test) menggunakan scaler yang sudah di-fit untuk menjaga konsistensi
+     Menampilkan 5 data pertama hasil scaling pada data latih sebagai contoh
+     Menampilkan statistik deskriptif hasil scaling untuk memastikan data sudah terstandarisasi.:
 
    ```python
-   from sklearn.preprocessing import StandardScaler
-   scaler = StandardScaler()
-   X_train_scaled = scaler.fit_transform(X_train)
-   X_test_scaled = scaler.transform(X_test)
+   # Inisialisasi scaler
+    scaler = StandardScaler()
+
+   # Fit scaler hanya pada data train, lalu transform train dan test
+    X_train_scaled = scaler.fit_transform(X_train)
+    X_test_scaled = scaler.transform(X_test)
+
+   # Verifikasi data hasil scaling
+    print("5 Data Pertama setelah Scaling (Train):")
+    print(pd.DataFrame(X_train_scaled, columns=features).head())
+
+    print("\nStatistik Deskriptif setelah Scaling (Train):")
+    print(pd.DataFrame(X_train_scaled, columns=features).describe().round(2))
+
 
    ```
 
-   Standardisasi memastikan semua fitur memiliki skala yang sama, meningkatkan kinerja model, terutama untuk algoritma yang sensitif terhadap skala seperti Linear Regression.
+   Data fitur pada data latih telah diskalakan dengan rata-rata mendekati 0 dan standar deviasi 1.
+   Distribusi fitur pada data latih terlihat stabil dengan nilai minimum, maksimum, dan kuartil yang sesuai.
+   Data siap digunakan untuk proses pelatihan model machine learning.
 
-5. **Penanganan Nilai Tak Terhingga dan Missing Value Lanjutan**
+5. **Pembersihan Data (Handling Infinite dan Missing Values)**
 
-   * Ganti nilai tak terhingga dengan NaN, lalu imputasi:.
+   * Dua fitur utama (TreeCoverLoss_ha dan avg_tree_cover_loss_per_year) diperiksa dan dibersihkan dari nilai tak terhingga dan nilai kosong.
+     Nilai inf dan -inf diganti dengan NaN, kemudian semua NaN diimputasi dengan nilai median dari masing-masing kolom.:.
 
    ```python
-   df = df.replace([np.inf, -np.inf], np.nan)
-   median_value = df['avg_tree_cover_loss_per_year'].median()
-   df['avg_tree_cover_loss_per_year'] = df['avg_tree_cover_loss_per_year'].fillna(median_value)
+   # Tentukan fitur yang akan dipakai
+    features = ['TreeCoverLoss_ha', 'avg_tree_cover_loss_per_year']
+
+   # Ambil fitur dari df dan ganti nilai inf dengan NaN
+    X = df[features].replace([np.inf, -np.inf], np.nan)
+
+   # Imputasi nilai NaN dengan median tiap kolom
+    X = X.fillna(X.median())
+
+   # Target (asumsikan sudah bersih)
+    y = df['GrossEmissions_Co2_all_gases_Mg']
+
+   # Cek ulang missing value dan infinite values di X
+    print("Missing values setelah pembersihan:")
+    print(X.isnull().sum())
+    print("\nApakah ada infinite values di X?:")
+    print(np.isinf(X).sum())
+
 
    ```
-
-   Langkah ini penting untuk mengatasi masalah komputasi yang dapat muncul dari nilai tak terhingga.
+   Tidak ada nilai NaN atau inf yang tersisa di kedua kolom.
+   Dataset siap untuk dibagi menjadi data latih dan uji pada tahap berikutnya.
 
 6. **Train-Test Split**
 
-   * Membagi dataset menjadi data latih (80%) dan data uji (20%) untuk evaluasi model.
+   * Dataset yang sudah bersih dari nilai tak terhingga dan missing value dipisahkan menjadi dua bagian:
+     Data Latih (Training Set): 80% dari dataset digunakan untuk melatih model
+     Data Uji (Testing Set): 20% dari dataset digunakan untuk menguji performa model
+     Proses ini dilakukan menggunakan fungsi train_test_split dengan parameter random_state=42 agar hasil pembagian data dapat direproduksi
 
    ```python
-   features = ['TreeCoverLoss_ha', 'avg_tree_cover_loss_per_year']
-   X = df[features].replace([np.inf, -np.inf], np.nan).fillna(df[features].median())
-   y = df['GrossEmissions_Co2_all_gases_Mg']
-   X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+   # Split data bersih menjadi train dan test
+    X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+    )
+
+   # Tampilkan ukuran data hasil split
+    print(f"Data Train: {X_train.shape}")
+    print(f"Data Test : {X_test.shape}")
 
    ```
 
-   Pembagian ini memungkinkan evaluasi kinerja model pada data yang belum pernah dilihat selama proses pelatihan.
+   Data latih berukuran (3173, 2), berisi 3173 sampel dengan 2 fitur
+   Data uji berukuran (794, 2), siap digunakan untuk evaluasi model
 
 ## Modeling
 
@@ -322,8 +381,14 @@ Berikut hasil evaluasi ketiga model (nilai terbaru):
 Visualisasi perbandingan metrik antar model:
 
 * ![Perbandingan R² Score Antar Model](https://github.com/user-attachments/assets/bd9dda45-c423-4c46-92d3-158de103a45f)
+  Grafik menampilkan perbandingan performa model berdasarkan kemampuan menjelaskan variansi data target. Terlihat bahwa Random Forest memiliki nilai R² tertinggi, diikuti Linear 
+  Regression, dan terakhir XGBoost.
 * ![Perbandingan MAE Antar Model](https://github.com/user-attachments/assets/a9c87736-8df9-4101-b85a-84c3f8d19287)
+  Grafik memperlihatkan perbandingan error absolut rata-rata antar model, dimana Random Forest memiliki MAE terendah, menunjukkan performa terbaik dalam hal akurasi prediksi. Linear 
+  Regression dan XGBoost memiliki MAE lebih tinggi, dengan XGBoost sedikit lebih baik dibanding Linear Regression pada grafik ini.
 * ![Perbandingan RMSE Antar Model](https://github.com/user-attachments/assets/4005154d-55bb-45d2-8ee3-a11c7864e724)
+  Grafik memperlihatkan perbandingan error kuadrat rata-rata antar model, di mana Random Forest menunjukkan RMSE terendah, menandakan model ini memiliki prediksi yang lebih konsisten 
+  dan akurat. Model Linear Regression dan XGBoost memiliki RMSE lebih tinggi, dengan XGBoost menunjukkan error terbesar di antara ketiganya.
 
 ### Analisis Hasil
 

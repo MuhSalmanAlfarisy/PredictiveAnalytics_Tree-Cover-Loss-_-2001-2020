@@ -37,11 +37,7 @@ Solusi yang diajukan untuk mencapai tujuan proyek:
 
 ## Data Understanding
 
-Berikut contoh dokumentasi **Data Understanding** yang lengkap, khusus untuk melengkapi bagian yang belum kamu buat supaya memenuhi catatan reviewer. Kamu bisa copy-paste langsung ke notebook sebagai markdown cell.
-
 ---
-
-# 📚 Data Understanding
 
 ### **Sumber Data**
 

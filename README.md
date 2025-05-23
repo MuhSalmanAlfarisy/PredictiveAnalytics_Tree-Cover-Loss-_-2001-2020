@@ -37,7 +37,57 @@ Solusi yang diajukan untuk mencapai tujuan proyek:
 
 ## Data Understanding
 
-Dataset yang digunakan dalam proyek ini adalah "TreeCoverLoss\_2001-2020\_ByRegion.csv" yang berisi informasi tentang kehilangan tutupan pohon dan emisi CO₂ di berbagai wilayah dunia selama periode 2001-2020. Dataset ini diperoleh dari [Kaggle](https://www.kaggle.com/datasets/kkhandekar/tree-cover-loss-20012020/data?select=TreeCoverLoss_2001-2020_ByRegion.csv).
+Berikut contoh dokumentasi **Data Understanding** yang lengkap, khusus untuk melengkapi bagian yang belum kamu buat supaya memenuhi catatan reviewer. Kamu bisa copy-paste langsung ke notebook sebagai markdown cell.
+
+---
+
+# 📚 Data Understanding
+
+### **Sumber Data**
+
+Dataset ini diambil dari Kaggle dengan judul *"Tree Cover Loss 2001-2020 by Region"*.
+Link sumber data:
+[Kaggle - Tree Cover Loss 2001-2020](https://www.kaggle.com/datasets/kkhandekar/tree-cover-loss-20012020?utm_source=chatgpt.com)
+
+Dataset disimpan pada path lokal: `/content/TreeCoverLoss_2001-2020_ByRegion.csv`
+
+---
+
+### **Jumlah Data**
+
+Dataset terdiri dari **3967 baris** dan **4 kolom**, memberikan data kerusakan tutupan hutan dan emisi CO₂ pada berbagai tahun dan wilayah.
+
+---
+
+### **Kondisi Data**
+
+* **Missing Value:**
+  Tidak terdapat nilai kosong (missing values) pada semua kolom, sehingga data lengkap dan siap digunakan tanpa perlu imputasi.
+* **Duplikasi:**
+  Tidak ditemukan data duplikat, memastikan setiap baris merepresentasikan data unik.
+* **Outlier:**
+  Berdasarkan analisis boxplot, terdapat beberapa nilai ekstrem (outlier) terutama pada kolom `TreeCoverLoss_ha` dan `GrossEmissions_Co2_all_gases_Mg`. Nilai ini menggambarkan kejadian kehilangan tutupan hutan dan emisi gas yang sangat tinggi di beberapa tahun/region tertentu, yang merupakan fenomena nyata dan penting untuk dianalisis lebih lanjut.
+* **Tipe Data:**
+
+  * `CountryCode` : tipe objek (kategori)
+  * `Year` : tipe integer
+  * `TreeCoverLoss_ha` : tipe float (numerik kontinu)
+  * `GrossEmissions_Co2_all_gases_Mg` : tipe float (numerik kontinu)
+
+---
+
+### **Uraian Fitur**
+
+| Nama Kolom                        | Deskripsi                                                                                                  |
+| --------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `CountryCode`                     | Kode negara atau wilayah yang merepresentasikan lokasi data tutupan hutan dan emisi CO₂.                   |
+| `Year`                            | Tahun pengukuran data, dari 2001 sampai 2020.                                                              |
+| `TreeCoverLoss_ha`                | Luas kehilangan tutupan pohon dalam hektar (ha) untuk tahun dan wilayah tertentu.                          |
+| `GrossEmissions_Co2_all_gases_Mg` | Jumlah emisi CO₂ dari semua jenis gas dalam Megagram (Mg) yang dihasilkan akibat kehilangan tutupan hutan. |
+
+---
+
+Dokumentasi ini melengkapi pemahaman dasar dataset yang akan digunakan dalam analisis dan pemodelan. Dengan data yang lengkap dan kondisi yang sudah diketahui,
 
 ### Variabel-variabel dalam dataset:
 

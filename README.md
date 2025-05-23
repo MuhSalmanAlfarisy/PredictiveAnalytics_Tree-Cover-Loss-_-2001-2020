@@ -233,8 +233,14 @@ Dalam proyek ini, tiga model regresi dikembangkan untuk memprediksi emisi CO₂ 
    * Kekurangan: Hanya dapat menangkap hubungan linear, kurang fleksibel untuk data kompleks.
 
    ```python
-   lr_model = LinearRegression()
-   lr_model.fit(X_train, y_train)
+   # Inisialisasi model Linear Regression
+    lr_model = LinearRegression()
+
+   # Latih model dengan data train yang sudah diskalakan
+    lr_model.fit(X_train_scaled, y_train)
+
+   # Prediksi data uji
+    y_pred_lr = lr_model.predict(X_test_scaled)
    ```
 
 2. **Random Forest Regressor**
@@ -244,8 +250,14 @@ Dalam proyek ini, tiga model regresi dikembangkan untuk memprediksi emisi CO₂ 
    * Kekurangan: Komputasi lebih berat, model "black box" yang sulit diinterpretasi.
 
    ```python
-   rf_model = RandomForestRegressor(n_estimators=100, random_state=42)
-   rf_model.fit(X_train, y_train)
+   # Inisialisasi model Random Forest dengan 100 estimator
+    rf_model = RandomForestRegressor(n_estimators=100, random_state=42)
+
+   # Latih model dengan data train yang sudah diskalakan
+    rf_model.fit(X_train_scaled, y_train)
+
+   # Prediksi data uji
+    y_pred_rf = rf_model.predict(X_test_scaled)
    ```
 
 3. **XGBoost Regressor**
@@ -255,8 +267,14 @@ Dalam proyek ini, tiga model regresi dikembangkan untuk memprediksi emisi CO₂ 
    * Kekurangan: Rawan overfitting, memerlukan fine-tuning parameter, model "black box".
 
    ```python
-   xgb_model = XGBRegressor(objective='reg:squarederror', n_estimators=100, random_state=42)
-   xgb_model.fit(X_train, y_train)
+   # Inisialisasi model XGBoost
+    xgb_model = XGBRegressor(objective='reg:squarederror', n_estimators=100, random_state=42)
+
+   # Latih model dengan data train yang sudah diskalakan
+    xgb_model.fit(X_train_scaled, y_train)
+
+   # Prediksi data uji
+    y_pred_xgb = xgb_model.predict(X_test_scaled)
    ```
 
 Fitur yang digunakan dalam pemodelan:

@@ -383,13 +383,13 @@ Berikut hasil evaluasi ketiga model (nilai terbaru):
 Visualisasi perbandingan metrik antar model:
 
 * ![Perbandingan R² Score Antar Model](https://github.com/user-attachments/assets/bd9dda45-c423-4c46-92d3-158de103a45f)
-  Grafik menampilkan perbandingan performa model berdasarkan kemampuan menjelaskan variansi data target. Terlihat bahwa Random Forest memiliki nilai R² tertinggi, diikuti Linear 
+  * Grafik menampilkan perbandingan performa model berdasarkan kemampuan menjelaskan variansi data target. Terlihat bahwa Random Forest memiliki nilai R² tertinggi, diikuti Linear 
   Regression, dan terakhir XGBoost.
 * ![Perbandingan MAE Antar Model](https://github.com/user-attachments/assets/a9c87736-8df9-4101-b85a-84c3f8d19287)
-  Grafik memperlihatkan perbandingan error absolut rata-rata antar model, dimana Random Forest memiliki MAE terendah, menunjukkan performa terbaik dalam hal akurasi prediksi. Linear 
+  * Grafik memperlihatkan perbandingan error absolut rata-rata antar model, dimana Random Forest memiliki MAE terendah, menunjukkan performa terbaik dalam hal akurasi prediksi. Linear 
   Regression dan XGBoost memiliki MAE lebih tinggi, dengan XGBoost sedikit lebih baik dibanding Linear Regression pada grafik ini.
 * ![Perbandingan RMSE Antar Model](https://github.com/user-attachments/assets/4005154d-55bb-45d2-8ee3-a11c7864e724)
-  Grafik memperlihatkan perbandingan error kuadrat rata-rata antar model, di mana Random Forest menunjukkan RMSE terendah, menandakan model ini memiliki prediksi yang lebih konsisten 
+  * Grafik memperlihatkan perbandingan error kuadrat rata-rata antar model, di mana Random Forest menunjukkan RMSE terendah, menandakan model ini memiliki prediksi yang lebih konsisten 
   dan akurat. Model Linear Regression dan XGBoost memiliki RMSE lebih tinggi, dengan XGBoost menunjukkan error terbesar di antara ketiganya.
 
 ### Analisis Hasil

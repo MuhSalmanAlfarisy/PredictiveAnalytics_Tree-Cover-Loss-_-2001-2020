@@ -142,7 +142,10 @@ Beberapa teknik data preparation yang diterapkan dalam proyek ini:
 
 1. **Penanganan Missing Value**
 
-   * Missing value pada kolom TreeCoverLoss\_ha dan GrossEmissions\_Co2\_all\_gases\_Mg diisi dengan nilai median dari kolom tersebut.
+   * Pertama, dilakukan pengecekan missing values pada dataset menggunakan fungsi .isnull().sum() untuk memastikan ada atau tidaknya nilai yang hilang di setiap kolom. Meski hasil awal 
+     menunjukkan tidak ada missing value, langkah pengisian missing value dengan median tetap dilakukan pada kolom TreeCoverLoss_ha dan GrossEmissions_Co2_all_gases_Mg sebagai tindakan 
+     preventif untuk menjaga konsistensi data jika terdapat nilai kosong pada tahap lain. Setelah pengisian, pengecekan ulang dilakukan untuk memastikan semua missing value telah 
+     teratasi..
 
    ```python
    # Memeriksa missing values sebelum penanganan
@@ -159,11 +162,14 @@ Beberapa teknik data preparation yang diterapkan dalam proyek ini:
 
    ```
 
-   Penggunaan median dipilih karena lebih robust terhadap outlier dibandingkan mean, mengingat data memiliki beberapa outlier yang signifikan.
+    Tidak ditemukan missing value pada semua kolom sebelum maupun sesudah penanganan, menandakan data sudah lengkap. Langkah pengisian missing value dengan median tidak mengubah dataset 
+    karena tidak ada nilai kosong, namun tetap menjadi prosedur standar dalam pembersihan data.
 
 2. **Feature Engineering**
 
-   * Membuat fitur baru `avg_tree_cover_loss_per_year` yang menghitung rata-rata kehilangan tutupan pohon per tahun.
+   * Pembuatan Fitur Baru: Rata-rata Kehilangan Tutupan Pohon per Tahun
+     Fitur baru avg_tree_cover_loss_per_year dibuat dengan membagi nilai kehilangan tutupan pohon (TreeCoverLoss_ha) dengan selisih tahun dari tahun pengukuran hingga 2020. Rumus ini 
+     memberikan gambaran rata-rata kehilangan tutupan pohon per tahun sejak tahun pengukuran, membantu menangkap tingkat perubahan yang lebih terstandardisasi antar tahun berbeda.
 
    ```python
    # Membuat fitur baru: rata-rata kehilangan tutupan pohon per tahun
@@ -173,11 +179,14 @@ Beberapa teknik data preparation yang diterapkan dalam proyek ini:
     df[['TreeCoverLoss_ha', 'Year', 'avg_tree_cover_loss_per_year']].head()
    ```
 
-   Fitur ini dapat memberikan informasi tentang laju kehilangan tutupan pohon yang dinormalisasi terhadap waktu.
+   Kolom baru berhasil ditambahkan ke dataset, dengan nilai yang merepresentasikan rata-rata tahunan kehilangan tutupan pohon untuk setiap baris data. Contoh nilai awal menunjukkan 
+   variasi besar sesuai dengan data asli dan tahun masing-masing.
 
 3. **Encoding Fitur Kategorikal**
 
-   * Mengubah fitur kategorikal CountryCode menjadi bentuk numerik menggunakan Label Encoding.
+   * Menggunakan LabelEncoder dari scikit-learn untuk mengubah fitur kategorikal CountryCode menjadi representasi numerik yang dapat digunakan oleh algoritma machine learning. Proses 
+     ini mengonversi setiap kode negara menjadi angka unik secara konsisten, yang membantu model memproses data kategori secara efektif. Pembuatan kolom baru CountryCode_encoded juga 
+     menghindari masalah chained assignment..
 
    ```python
    # Inisialisasi LabelEncoder
@@ -190,9 +199,59 @@ Beberapa teknik data preparation yang diterapkan dalam proyek ini:
     df[['CountryCode', 'CountryCode_encoded']].head()
    ```
 
-   Encoding ini diperlukan agar variabel kategorikal dapat diproses oleh model machine learning.
+   Kolom baru CountryCode_encoded berhasil ditambahkan ke dataset, dengan nilai numerik yang mewakili setiap kode negara. Contoh data menunjukkan pengkodean awal dari beberapa negara.
+4. **Pembersihan Data (Handling Infinite dan Missing Values)**
 
-4. **Feature Scaling**
+   * Dua fitur utama (TreeCoverLoss_ha dan avg_tree_cover_loss_per_year) diperiksa dan dibersihkan dari nilai tak terhingga dan nilai kosong.
+     Nilai inf dan -inf diganti dengan NaN, kemudian semua NaN diimputasi dengan nilai median dari masing-masing kolom.:.
+
+   ```python
+   # Tentukan fitur yang akan dipakai
+    features = ['TreeCoverLoss_ha', 'avg_tree_cover_loss_per_year']
+
+   # Ambil fitur dari df dan ganti nilai inf dengan NaN
+    X = df[features].replace([np.inf, -np.inf], np.nan)
+
+   # Imputasi nilai NaN dengan median tiap kolom
+    X = X.fillna(X.median())
+
+   # Target (asumsikan sudah bersih)
+    y = df['GrossEmissions_Co2_all_gases_Mg']
+
+   # Cek ulang missing value dan infinite values di X
+    print("Missing values setelah pembersihan:")
+    print(X.isnull().sum())
+    print("\nApakah ada infinite values di X?:")
+    print(np.isinf(X).sum())
+
+
+   ```
+   Tidak ada nilai NaN atau inf yang tersisa di kedua kolom.
+   Dataset siap untuk dibagi menjadi data latih dan uji pada tahap berikutnya.
+5. **Train-Test Split**
+
+   * Dataset yang sudah bersih dari nilai tak terhingga dan missing value dipisahkan menjadi dua bagian:
+     Data Latih (Training Set): 80% dari dataset digunakan untuk melatih model
+     Data Uji (Testing Set): 20% dari dataset digunakan untuk menguji performa model
+     Proses ini dilakukan menggunakan fungsi train_test_split dengan parameter random_state=42 agar hasil pembagian data dapat direproduksi
+
+   ```python
+   # Split data bersih menjadi train dan test
+    X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+    )
+
+   # Tampilkan ukuran data hasil split
+    print(f"Data Train: {X_train.shape}")
+    print(f"Data Test : {X_test.shape}")
+
+   ```
+
+   Data latih berukuran (3173, 2), berisi 3173 sampel dengan 2 fitur
+   Data uji berukuran (794, 2), siap digunakan untuk evaluasi model
+
+
+6. **Feature Scaling**
 
    * Proses Menginisialisasi StandardScaler untuk menormalkan fitur sehingga memiliki rata-rata 0 dan standar deviasi 1
      Melakukan fit scaler hanya pada data latih (X_train) agar informasi skala berasal dari data pelatihan saja
@@ -222,56 +281,7 @@ Beberapa teknik data preparation yang diterapkan dalam proyek ini:
    Distribusi fitur pada data latih terlihat stabil dengan nilai minimum, maksimum, dan kuartil yang sesuai.
    Data siap digunakan untuk proses pelatihan model machine learning.
 
-5. **Pembersihan Data (Handling Infinite dan Missing Values)**
 
-   * Dua fitur utama (TreeCoverLoss_ha dan avg_tree_cover_loss_per_year) diperiksa dan dibersihkan dari nilai tak terhingga dan nilai kosong.
-     Nilai inf dan -inf diganti dengan NaN, kemudian semua NaN diimputasi dengan nilai median dari masing-masing kolom.:.
-
-   ```python
-   # Tentukan fitur yang akan dipakai
-    features = ['TreeCoverLoss_ha', 'avg_tree_cover_loss_per_year']
-
-   # Ambil fitur dari df dan ganti nilai inf dengan NaN
-    X = df[features].replace([np.inf, -np.inf], np.nan)
-
-   # Imputasi nilai NaN dengan median tiap kolom
-    X = X.fillna(X.median())
-
-   # Target (asumsikan sudah bersih)
-    y = df['GrossEmissions_Co2_all_gases_Mg']
-
-   # Cek ulang missing value dan infinite values di X
-    print("Missing values setelah pembersihan:")
-    print(X.isnull().sum())
-    print("\nApakah ada infinite values di X?:")
-    print(np.isinf(X).sum())
-
-
-   ```
-   Tidak ada nilai NaN atau inf yang tersisa di kedua kolom.
-   Dataset siap untuk dibagi menjadi data latih dan uji pada tahap berikutnya.
-
-6. **Train-Test Split**
-
-   * Dataset yang sudah bersih dari nilai tak terhingga dan missing value dipisahkan menjadi dua bagian:
-     Data Latih (Training Set): 80% dari dataset digunakan untuk melatih model
-     Data Uji (Testing Set): 20% dari dataset digunakan untuk menguji performa model
-     Proses ini dilakukan menggunakan fungsi train_test_split dengan parameter random_state=42 agar hasil pembagian data dapat direproduksi
-
-   ```python
-   # Split data bersih menjadi train dan test
-    X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-    )
-
-   # Tampilkan ukuran data hasil split
-    print(f"Data Train: {X_train.shape}")
-    print(f"Data Test : {X_test.shape}")
-
-   ```
-
-   Data latih berukuran (3173, 2), berisi 3173 sampel dengan 2 fitur
-   Data uji berukuran (794, 2), siap digunakan untuk evaluasi model
 
 ## Modeling
 

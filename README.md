@@ -298,11 +298,12 @@ Untuk mengevaluasi kinerja model, tiga metrik evaluasi digunakan:
 
 Berikut hasil evaluasi ketiga model (nilai terbaru):
 
-| Model             | MAE             | RMSE            | R² Score |
-| ----------------- | --------------- | --------------- | -------- |
-| Linear Regression | 20,048,150.3723 | 85,785,222.4055 | 0.7428   |
-| Random Forest     | 16,088,917.4141 | 81,385,115.6208 | 0.7685   |
-| XGBoost           | 17,472,013.1603 | 93,270,812.1925 | 0.6959   |
+| Model             | MAE           | RMSE          | R² Score   |
+| ----------------- | ------------- | ------------- | ---------- |
+| Linear Regression | 20,048,150.37 | 85,785,222.41 | 0.7428     |
+| Random Forest     | 16,088,917.41 | 81,385,115.62 | **0.7685** |
+| XGBoost           | 17,472,013.16 | 93,270,812.19 | 0.6959     |
+
 
 Visualisasi perbandingan metrik antar model:
 

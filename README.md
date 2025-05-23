@@ -37,8 +37,6 @@ Solusi yang diajukan untuk mencapai tujuan proyek:
 
 ## Data Understanding
 
----
-
 ### **Sumber Data**
 
 Dataset ini diambil dari Kaggle dengan judul *"Tree Cover Loss 2001-2020 by Region"*.
@@ -47,13 +45,9 @@ Link sumber data:
 
 Dataset disimpan pada path lokal: `/content/TreeCoverLoss_2001-2020_ByRegion.csv`
 
----
-
 ### **Jumlah Data**
 
 Dataset terdiri dari **3967 baris** dan **4 kolom**, memberikan data kerusakan tutupan hutan dan emisi CO₂ pada berbagai tahun dan wilayah.
-
----
 
 ### **Kondisi Data**
 
@@ -69,8 +63,6 @@ Dataset terdiri dari **3967 baris** dan **4 kolom**, memberikan data kerusakan t
   * `Year` : tipe integer
   * `TreeCoverLoss_ha` : tipe float (numerik kontinu)
   * `GrossEmissions_Co2_all_gases_Mg` : tipe float (numerik kontinu)
-
----
 
 ### **Uraian Fitur**
 

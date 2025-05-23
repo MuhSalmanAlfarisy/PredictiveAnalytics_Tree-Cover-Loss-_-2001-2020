@@ -159,6 +159,7 @@ Beberapa teknik data preparation yang diterapkan dalam proyek ini:
    ```python
    df['TreeCoverLoss_ha'] = df['TreeCoverLoss_ha'].fillna(df['TreeCoverLoss_ha'].median())
    df['GrossEmissions_Co2_all_gases_Mg'] = df['GrossEmissions_Co2_all_gases_Mg'].fillna(df['GrossEmissions_Co2_all_gases_Mg'].median())
+
    ```
 
    Penggunaan median dipilih karena lebih robust terhadap outlier dibandingkan mean, mengingat data memiliki beberapa outlier yang signifikan.
@@ -186,24 +187,27 @@ Beberapa teknik data preparation yang diterapkan dalam proyek ini:
 
 4. **Feature Scaling**
 
-   * Menerapkan standardisasi pada fitur numerik menggunakan StandardScaler untuk menormalkan skala data.
+   * Standarisasi fitur dengan StandardScaler:.
 
    ```python
-   features_to_scale = ['TreeCoverLoss_ha', 'GrossEmissions_Co2_all_gases_Mg', 'avg_tree_cover_loss_per_year']
+   from sklearn.preprocessing import StandardScaler
    scaler = StandardScaler()
-   scaled_features = scaler.fit_transform(df[features_to_scale])
+   X_train_scaled = scaler.fit_transform(X_train)
+   X_test_scaled = scaler.transform(X_test)
+
    ```
 
    Standardisasi memastikan semua fitur memiliki skala yang sama, meningkatkan kinerja model, terutama untuk algoritma yang sensitif terhadap skala seperti Linear Regression.
 
-5. **Penanganan Nilai Tak Terhingga**
+5. **Penanganan Nilai Tak Terhingga dan Missing Value Lanjutan**
 
-   * Mengganti nilai tak terhingga (infinity) dengan NaN, kemudian mengisi nilai NaN dengan median.
+   * Ganti nilai tak terhingga dengan NaN, lalu imputasi:.
 
    ```python
    df = df.replace([np.inf, -np.inf], np.nan)
    median_value = df['avg_tree_cover_loss_per_year'].median()
-   df = df.assign(avg_tree_cover_loss_per_year=df['avg_tree_cover_loss_per_year'].fillna(median_value))
+   df['avg_tree_cover_loss_per_year'] = df['avg_tree_cover_loss_per_year'].fillna(median_value)
+
    ```
 
    Langkah ini penting untuk mengatasi masalah komputasi yang dapat muncul dari nilai tak terhingga.
@@ -213,7 +217,11 @@ Beberapa teknik data preparation yang diterapkan dalam proyek ini:
    * Membagi dataset menjadi data latih (80%) dan data uji (20%) untuk evaluasi model.
 
    ```python
+   features = ['TreeCoverLoss_ha', 'avg_tree_cover_loss_per_year']
+   X = df[features].replace([np.inf, -np.inf], np.nan).fillna(df[features].median())
+   y = df['GrossEmissions_Co2_all_gases_Mg']
    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
    ```
 
    Pembagian ini memungkinkan evaluasi kinerja model pada data yang belum pernah dilihat selama proses pelatihan.
